@@ -1,17 +1,11 @@
-import { User } from "../models/user.model.js";
 import { UniqueConstraintError, ValidationError } from "sequelize";
-import {
-  deleteImage,
-  encryptPassword,
-  renameAndGetPathImage,
-} from "../utils/index.js";
+import { deleteImage } from "../utils/index.js";
+import { userService } from "../services/user.service.js";
 
 // Get all users
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll({
-      attributes: ["id", "name", "lastname", "email", "image"],
-    });
+    const users = await userService.getAllUsers();
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: "Error getting all users" });
@@ -21,21 +15,19 @@ export const getAllUsers = async (req, res) => {
 // Create a user
 export const createUser = async (req, res) => {
   const { name, lastname, email, password } = req.body;
-
+  const image = req.file ? req.file.filename : null;
   try {
-    const newUser = await User.create({
+    await userService.createUser({
       name,
       lastname,
       email,
-      password: await encryptPassword(password),
+      image,
+      password,
     });
-    const image = renameAndGetPathImage(req.file, newUser.id);
-    newUser.set({ image });
-    await newUser.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
     console.log(error);
-    deleteImage(req.file?.path); // Delete image if it exists
+    deleteImage(req.file?.filename); // Delete image if it exists
     if (error instanceof UniqueConstraintError) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -55,26 +47,27 @@ export const updateUser = async (req, res) => {
   }
   const { name, lastname, email, password } = req.body;
   try {
-    const newImage = renameAndGetPathImage(req.file, id);
-    const user = await User.findOne({ where: { id } });
+    const user = await userService.getUserById(id);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
 
-    if (name || lastname || email || password || newImage) {
-      if (newImage) {
+    if (name || lastname || email || password || req.file) {
+      if (req.file) {
         // Delelete old image
         deleteImage(user.image);
       }
-      user.set({
-        name: name ? name : user.name,
-        lastname: lastname ? lastname : user.lastname,
-        email: email ? email : user.email,
-        image: newImage ? newImage : user.image,
-        password: password ? await encryptPassword(password) : user.password,
+      const image = req.file ? req.file.filename : user.image;
+
+      await userService.updateUser(user, {
+        name,
+        lastname,
+        email,
+        password,
+        image,
       });
-      await user.save();
+
       res.status(200).json({ message: "User updated successfully" });
     } else {
       res.status(400).json({ message: "At least one field must be updated" });
@@ -96,15 +89,16 @@ export const deleteUser = async (req, res) => {
     return;
   }
   try {
-    const user = await User.findOne({ where: { id } });
+    const user = await userService.getUserById(id);
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
     deleteImage(user.image);
-    await user.destroy();
+    await userService.deleteUser(user);
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Error deleting user" });
   }
 };
