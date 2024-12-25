@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import fs from "node:fs";
+import { DESTINATION } from "../middleware/file.middleware.js";
+import { join } from "node:path";
 
 export const encryptPassword = async (password) => {
   if (!password) return null;
@@ -7,20 +9,9 @@ export const encryptPassword = async (password) => {
   return await bcrypt.hash(password, salt);
 };
 
-export const renameAndGetPathImage = (file, userId) => {
-  if (!file) {
-    return null;
-  }
-  const newPath = `./uploads/${userId}-${file.originalname}`;
-  fs.rename(file.path, newPath, (err) => {
-    if (err) throw err;
-  });
-  return newPath;
-};
-
-export const deleteImage = (imagePath) => {
-  if (!imagePath) return;
-  fs.unlink(imagePath, (err) => {
+export const deleteImage = (filename) => {
+  if (!filename) return;
+  fs.unlink(join(DESTINATION, filename), (err) => {
     if (err) throw err;
   });
 };
