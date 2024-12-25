@@ -5,15 +5,7 @@ import {
   getAllUsers,
   updateUser,
 } from "../controllers/user.controller.js";
-import multer from "multer";
-import fs from "node:fs";
-
-// delete upload folder before starting the server
-if (fs.existsSync("uploads")) {
-  fs.rmSync("uploads", { recursive: true, force: true });
-}
-
-const storage = multer({ dest: "uploads/" });
+import { storage } from "../middleware/file.middleware.js";
 
 const router = Router();
 
