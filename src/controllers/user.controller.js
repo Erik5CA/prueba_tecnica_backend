@@ -34,6 +34,7 @@ export const createUser = async (req, res) => {
     await newUser.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
+    console.log(error);
     deleteImage(req.file?.path); // Delete image if it exists
     if (error instanceof UniqueConstraintError) {
       return res.status(400).json({ message: "User already exists" });
@@ -79,6 +80,7 @@ export const updateUser = async (req, res) => {
       res.status(400).json({ message: "At least one field must be updated" });
     }
   } catch (error) {
+    console.log(error);
     if (error instanceof UniqueConstraintError) {
       return res.status(400).json({ message: "Email already exists" });
     }
