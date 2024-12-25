@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
 
+// Define the user model
 export const User = sequelize.define(
   "user",
   {
@@ -72,6 +73,6 @@ export const User = sequelize.define(
     },
   },
   {
-    timestamps: false,
+    timestamps: false, // Disable timestamps for createdAt and updatedAt
   }
 );

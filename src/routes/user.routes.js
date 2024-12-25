@@ -16,9 +16,11 @@ router.get("/", getAllUsers);
 router.post("/", storage.single("image"), createUser);
 
 // Update a user
+// Parameter id represents the id of the user to update
 router.put("/:id", storage.single("image"), updateUser);
 
 // Delete a user
+// Parameter id represents the id of the user to delete
 router.delete("/:id", deleteUser);
 
 export default router;

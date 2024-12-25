@@ -3,7 +3,9 @@ import fs from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Get the current directory
 const CURRENT_DIR = dirname(fileURLToPath(import.meta.url));
+// Define the destination folder
 export const DESTINATION = join(CURRENT_DIR, "../uploads");
 
 // delete upload folder before starting the server
@@ -11,6 +13,7 @@ if (fs.existsSync(DESTINATION)) {
   fs.rmSync(DESTINATION, { recursive: true, force: true });
 }
 
+// Define the storage middleware
 export const storage = multer({
   storage: multer.diskStorage({
     destination: DESTINATION,
