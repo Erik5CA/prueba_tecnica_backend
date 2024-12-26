@@ -27,9 +27,7 @@ const createUser = async ({ name, lastname, email, password, image }) => {
   @returns {Promise<User[]>} - An array of users
 */
 const getAllUsers = async () => {
-  const users = await User.findAll({
-    attributes: ["id", "name", "lastname", "email", "image"],
-  });
+  const users = await User.findAll();
   return users;
 };
 
