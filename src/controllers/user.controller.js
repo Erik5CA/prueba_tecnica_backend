@@ -56,7 +56,7 @@ export const updateUser = async (req, res) => {
     if (name || lastname || email || password || req.file) {
       if (req.file) {
         // Delelete old image
-        deleteImage(user.image);
+        await deleteImage(user.image);
       }
       const image = req.file ? req.file.filename : user.image;
 
@@ -94,7 +94,7 @@ export const deleteUser = async (req, res) => {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    deleteImage(user.image);
+    await deleteImage(user.image);
     await userService.deleteUser(user);
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {

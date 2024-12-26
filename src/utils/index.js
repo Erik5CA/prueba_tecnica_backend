@@ -11,10 +11,12 @@ export const encryptPassword = async (password) => {
 };
 
 // Delete image
-export const deleteImage = (filename) => {
+export const deleteImage = async (filename) => {
   if (!filename) return; // If no filename, do nothing
-  // Delete the image from the uploads folder
-  fs.unlink(join(DESTINATION, filename), (err) => {
-    if (err) throw err;
-  });
+  try {
+    const filePath = join(DESTINATION, filename);
+    fs.unlinkSync(filePath);
+  } catch (error) {
+    console.log(error);
+  }
 };
